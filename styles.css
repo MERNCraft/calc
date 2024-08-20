@@ -1,0 +1,361 @@
+:root {
+  font-family: 'Courier New', Courier, monospace;
+
+  --white: #fff;
+  --light: #ddd;
+  --dark:  #222;
+  --bg:    #030;
+  --rim:   #060;
+  --red:   #600;
+  --blue:  #00f;
+
+  --main:  300px;
+  --half:  150px;
+  --opgap:  40px;
+  --psize:  25px;
+  --space:  16px;
+  --pad:     8px;
+  --oppad:   3px;
+  --brdr:    1px;
+
+  --size:   55px;
+  --drop:   74px;
+  --delta:  24px;
+  --tweak:  -10px;
+  --plus:   calc(var(--delta) + var(--tweak));
+  
+  --a: 0;
+  --b: 0;
+  counter-set:
+    a var(--a)
+    b var(--b)
+  ;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: var(--light);
+  background-color: var(--dark);
+}
+
+main {
+  position: relative;
+  width: var(--main);
+  height: var(--half);
+
+  border: var(--brdr) solid var(--white);
+  border-radius: var(--pad);
+  box-sizing: border-box;
+
+  background-color: var(--bg);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+}
+
+p {
+  position: absolute;
+  top: var(--pad);
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif; 
+  font-size: var(--psize);
+}
+
+.spacer {
+  flex: 1;
+}
+
+input {
+  position: absolute;
+  left: -999vw;
+}
+
+div {
+  position: relative;
+}
+
+label span {
+  width: var(--delta);
+  height: var(--delta);
+  font-size: var(--delta);
+  text-align: center;
+  border: var(--brdr) outset var(--rim);
+
+  &:hover:active {
+    background-color: var(--dark);
+  }
+}
+
+
+#a label span,
+#b label span {
+  position: absolute;
+  top: var(--drop);
+  display: none;
+
+  &.p {
+    left: var(--plus);
+    border-top-right-radius: var(--delta);
+    border-bottom-right-radius: var(--delta);
+
+    &:hover {
+      background-color: var(--red);
+    }
+  }
+
+  &.m {
+    left: var(--tweak);
+    border-top-left-radius: var(--delta);
+    border-bottom-left-radius: var(--delta);
+  
+    &:hover {
+      background-color: var(--blue);
+    }
+  }
+
+  &:hover:active {
+    border-style: inset;
+    background-color: var(--dark);
+  }
+}
+
+#operators {
+  position: absolute;
+  right: var(--opgap);
+  bottom: 0;
+  display: flex;
+
+  &:has(#plus:checked) {
+    ~ span.operator::after {
+      content: "+";
+    }
+    
+    ~ span.result::after {
+      --c: calc(var(--a) + var(--b));
+      counter-set: c var(--c);
+      content: counter(c);
+    }
+  }
+  &:has(#minus:checked) {
+    ~ span.operator::after {
+      content: "–";
+    }
+    
+    ~ span.result::after {
+      --c: calc(var(--a) - var(--b));
+      counter-set: c var(--c);
+      content: counter(c);
+    }
+  }
+  &:has(#times:checked) {
+    ~ span.operator::after {
+      content: "×";
+    }
+    ~ span.result::after {
+      --c: calc(var(--a) * var(--b));
+      counter-set: c var(--c);
+      content: counter(c);
+    }
+  }
+  &:has(#divided-by:checked){
+    ~ span.operator::after {
+      content: "÷";
+    }
+
+    ~ span.result::after {
+      --c: calc((var(--a) * 100) / var(--b)); /* scale by 100 */
+      --d: mod(var(--c), 100);                /* decimal part */
+      --i: calc((var(--c) - var(--d)) / 100); /* integer part */
+      counter-set:
+        i var(--i)
+        d var(--d)
+      ;
+      content: counter(i) "." counter(d);
+    }
+
+    /* Catch error when division by zero */
+    ~ #b:has(#b0:checked)
+    ~ span.result::after {
+      content: "NaN";
+    }
+  }
+
+  span {
+    display: block;
+    position: relative;
+    top: auto;
+    padding: var(--oppad);
+    opacity: 0.75;
+  }
+
+  :checked ~ span {
+    border-style: inset;
+    background-color: var(--dark);
+    opacity: 1;
+  }
+}
+
+
+span.operator,
+span.display,
+span.equals,
+span.result {
+  font-size: var(--size);
+}
+
+#a {
+  margin-left: var(--space);
+}
+
+span.result {
+  margin-right: var(--space);
+}
+
+
+html:has(#a0:checked) {
+  --a: 0;
+  .a9 span.m { display: block }
+  .a1 span.p { display: block }
+}
+html:has(#a1:checked) {
+  --a: 1;
+  .a0 span.m { display: block }
+  .a2 span.p { display: block }
+}
+html:has(#a2:checked) {
+  --a: 2;
+  .a1 span.m { display: block }
+  .a3 span.p { display: block }
+}
+html:has(#a3:checked) {
+  --a: 3;
+  .a2 span.m { display: block }
+  .a4 span.p { display: block }
+}
+html:has(#a4:checked) {
+  --a: 4;
+  .a3 span.m { display: block }
+  .a5 span.p { display: block }
+}
+html:has(#a5:checked) {
+  --a: 5;
+  .a4 span.m { display: block }
+  .a6 span.p { display: block }
+}
+html:has(#a6:checked) {
+  --a: 6;
+  .a5 span.m { display: block }
+  .a7 span.p { display: block }
+}
+html:has(#a7:checked) {
+  --a: 7;
+  .a6 span.m { display: block }
+  .a8 span.p { display: block }
+}
+html:has(#a8:checked) {
+  --a: 8;
+  .a7 span.m { display: block }
+  .a9 span.p { display: block }
+}
+html:has(#a9:checked) {
+  --a: 9;
+  .a8 span.m { display: block }
+  .a0 span.p { display: block }
+}
+
+
+#a {
+  span.display::after {
+    content: counter(a)
+  }
+}
+
+
+html:has(#b0:checked) {
+  --b: 0;
+  .b9 span.m { display: block }
+  .b1 span.p { display: block }
+}
+html:has(#b1:checked) {
+  --b: 1;
+  .b0 span.m { display: block }
+  .b2 span.p { display: block }
+}
+html:has(#b2:checked) {
+  --b: 2;
+  .b1 span.m { display: block }
+  .b3 span.p { display: block }
+}
+html:has(#b3:checked) {
+  --b: 3;
+  .b2 span.m { display: block }
+  .b4 span.p { display: block }
+}
+html:has(#b4:checked) {
+  --b: 4;
+  .b3 span.m { display: block }
+  .b5 span.p { display: block }
+}
+html:has(#b5:checked) {
+  --b: 5;
+  .b4 span.m { display: block }
+  .b6 span.p { display: block }
+}
+html:has(#b6:checked) {
+  --b: 6;
+  .b5 span.m { display: block }
+  .b7 span.p { display: block }
+}
+html:has(#b7:checked) {
+  --b: 7;
+  .b6 span.m { display: block }
+  .b8 span.p { display: block }
+}
+html:has(#b8:checked) {
+  --b: 8;
+  .b7 span.m { display: block }
+  .b9 span.p { display: block }
+}
+html:has(#b9:checked) {
+  --b: 9;
+  .b8 span.m { display: block }
+  .b0 span.p { display: block }
+}
+
+#b {
+  span.display::after {
+    content: counter(b)
+  }
+}
+
+
+/* Show the GitHub logo */
+a.github {
+  width: 0;
+  height: 0;
+
+  img {
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 32px;
+    height: 32px;
+    filter: grayscale(1);
+    opacity: 0.25;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
